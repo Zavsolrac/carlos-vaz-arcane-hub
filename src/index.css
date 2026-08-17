@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --void-black: #0a0a0a;
+    --abyssal-navy: #0d1117;
+    --surface-card: #13171f;
+    --aged-gold: #c5a059;
+    --aged-gold-bright: #e9c176;
+    --crystalline-cyan: #00f2ff;
+    --petroleum-teal: #004d4d;
+    --on-surface: #e5e2e1;
+    --on-surface-variant: #d1c5b4;
+  }
+
+  /*
+    Ringbearer is the intended signature face for CARLOS VAZ.
+    It is NOT bundled and is not redistributed.
+    If the licensed font is installed locally, `local('Ringbearer')` picks it up.
+    Cinzel is the public fallback, not a stand-in name for Ringbearer.
+  */
+  @font-face {
+    font-family: 'Ringbearer';
+    src: local('Ringbearer'), local('Ringbearer Medium');
+    font-display: swap;
+  }
+
+  body {
+    background-color: var(--void-black);
+    color: var(--on-surface);
+    font-family: 'Lora', serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .font-cinzel {
+    font-family: 'Cinzel', serif;
+  }
+
+  .font-signature {
+    font-family: 'Ringbearer', 'Cinzel', serif;
+  }
+
+  .font-lora {
+    font-family: 'Lora', serif;
+  }
+
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+
+  :focus-visible {
+    outline: 2px solid #00f2ff;
+    outline-offset: 3px;
+  }
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #fff2cc 0%, #e9c176 40%, #c5a059 70%, #8c6e2d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cyan-glow-text {
+  color: #00f2ff;
+  text-shadow: 0 0 12px rgba(0, 242, 255, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2633;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c5a059;
+}
