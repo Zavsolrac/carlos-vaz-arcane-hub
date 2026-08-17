@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { soundFx } from '../utils/sound';
+import { pathWithView, type HubView } from '../lib/viewHash';
 import {
   Volume2,
   VolumeX,
@@ -13,8 +14,8 @@ import {
 } from 'lucide-react';
 
 interface NavbarProps {
-  activeView: 'portfolio' | 'generator';
-  setActiveView: (view: 'portfolio' | 'generator') => void;
+  activeView: HubView;
+  setActiveView: (view: HubView) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -48,6 +49,15 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
+  const navigate = (view: HubView) => {
+    soundFx.playHoverWhisper();
+    setActiveView(view);
+    if (typeof window !== 'undefined') {
+      const nextUrl = pathWithView(window.location.pathname, window.location.search, view);
+      window.history.pushState({ view }, '', nextUrl);
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#0a0a0a]/80 border-b border-[#004d4d]/40 px-4 py-3">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
@@ -56,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            setActiveView('portfolio');
+            navigate('portfolio');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           className="flex items-center gap-2 text-left group"
@@ -78,10 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center p-1 rounded-xl bg-[#13171f] border border-[#004d4d]/50">
           <button
             type="button"
-            onClick={() => {
-              soundFx.playHoverWhisper();
-              setActiveView('portfolio');
-            }}
+            onClick={() => navigate('portfolio')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-inter font-bold uppercase tracking-wider transition-all ${
               activeView === 'portfolio'
                 ? 'bg-[#00f2ff]/20 text-[#00f2ff] border border-[#00f2ff]/40 shadow-[0_0_12px_rgba(0,242,255,0.2)]'
@@ -94,10 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             type="button"
-            onClick={() => {
-              soundFx.playHoverWhisper();
-              setActiveView('generator');
-            }}
+            onClick={() => navigate('generator')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-inter font-bold uppercase tracking-wider transition-all ${
               activeView === 'generator'
                 ? 'bg-[#e9c176]/20 text-[#e9c176] border border-[#e9c176]/40 shadow-[0_0_12px_rgba(233,193,118,0.2)]'
@@ -115,6 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={toggleAudio}
+            aria-label={audioEnabled ? 'Desativar sons místicos' : 'Ativar sons místicos'}
             title={audioEnabled ? 'Desativar Sons Místicos' : 'Ativar Sons Místicos'}
             className={`p-2 rounded-lg border transition-all ${
               audioEnabled
@@ -133,6 +138,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={handleShare}
+            aria-label={copiedShare ? 'Link copiado' : 'Compartilhar link'}
             title="Compartilhar Link"
             className="p-2 rounded-lg bg-[#13171f] border border-white/10 text-[#d1c5b4] hover:text-[#e9c176] hover:border-[#e9c176]/40 transition-colors"
           >

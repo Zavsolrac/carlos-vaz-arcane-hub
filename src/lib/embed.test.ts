@@ -39,6 +39,16 @@ describe('embed generators', () => {
     expect(buildClickableMarkdown(options)).toContain('](https://portifoleo-carlos-vaz.vercel.app/)');
   });
 
+  it('wraps markdown-sensitive URL characters', () => {
+    const markdown = buildClickableMarkdown({
+      ...options,
+      targetUrl: 'https://example.com/a_(b)',
+      imageSrc: 'https://example.com/a%20b.png',
+    });
+    expect(markdown).toContain('<https://example.com/a_(b)>');
+    expect(markdown).toContain('https://example.com/a%20b.png');
+  });
+
   it('rejects unsafe iframe origins', () => {
     expect(buildIframeSnippet('javascript:alert(1)', 'x')).toBeNull();
   });
@@ -47,5 +57,6 @@ describe('embed generators', () => {
     const html = buildIframeSnippet('https://zavsolrac.github.io/carlos-vaz-arcane-hub/', 'Carlos Vaz');
     expect(html).toContain('src="https://zavsolrac.github.io/carlos-vaz-arcane-hub/"');
     expect(html).toContain('sandbox=');
+    expect(html).toContain('allow-downloads');
   });
 });

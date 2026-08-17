@@ -5,6 +5,7 @@ import { PNG } from 'pngjs';
 import jsQR from 'jsqr';
 import puppeteer from 'puppeteer-core';
 
+const BASE = '/carlos-vaz-arcane-hub';
 const DIST = join(process.cwd(), 'dist');
 const OUT = join(process.cwd(), 'coverage', 'export-audit');
 const MIME = {
@@ -26,7 +27,9 @@ function decodeQr(buf) {
 }
 
 const server = createServer((req, res) => {
-  const url = req.url === '/' ? '/index.html' : req.url.split('?')[0];
+  let url = req.url?.split('?')[0] ?? '/';
+  if (url.startsWith(BASE)) url = url.slice(BASE.length);
+  if (!url || url === '/') url = '/index.html';
   try {
     const file = join(DIST, decodeURIComponent(url));
     const body = readFileSync(file);
@@ -51,10 +54,7 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1400, height: 2200, deviceScaleFactor: 1 });
   page.setDefaultTimeout(20000);
-  await page.goto('http://127.0.0.1:4177/', { waitUntil: 'networkidle0' });
-  await page.evaluate(() => {
-    [...document.querySelectorAll('button')].find((btn) => btn.textContent?.includes('Gerador'))?.click();
-  });
+  await page.goto(`http://127.0.0.1:4177${BASE}/#gerador-png`, { waitUntil: 'networkidle0' });
   await page.waitForSelector('#arcane-export-root');
 
   const results = {};

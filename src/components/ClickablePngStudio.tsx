@@ -28,6 +28,7 @@ import {
 } from '../lib/exportPresets';
 import { readPngSize } from '../lib/png';
 import { generateQrDataUrl } from '../lib/qr';
+import { acceptLocalImageFile, extractImageSrcInBrowser } from '../lib/imageInput';
 import { sanitizeHttpUrl } from '../lib/urls';
 import { soundFx } from '../utils/sound';
 
@@ -42,6 +43,7 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
   const [copiedCodeType, setCopiedCodeType] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [imageInputError, setImageInputError] = useState<string | null>(null);
   const [activeEmbedType, setActiveEmbedType] = useState<'standard' | 'markdown' | 'iframe'>('standard');
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const exportRef = useRef<HTMLDivElement>(null);
@@ -72,43 +74,30 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
   }, [config.showQrCode, safeTarget]);
 
   const handleParseHtmlImage = () => {
+    setImageInputError(null);
     if (!htmlInput.trim()) return;
     soundFx.playArcaneChime(600, 0.2);
-    if (htmlInput.startsWith('http://') || htmlInput.startsWith('https://')) {
-      const url = sanitizeHttpUrl(htmlInput);
-      if (!url) return;
-      setAssociatedImageUrl(url);
-      setConfig((prev) => ({ ...prev, bgImageUrl: url }));
+    const src = extractImageSrcInBrowser(htmlInput);
+    if (!src) {
+      setImageInputError('Imagem inválida. Use http/https ou PNG/JPEG/WebP local.');
       return;
     }
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlInput, 'text/html');
-    const src = doc.querySelector('img')?.getAttribute('src') ?? htmlInput.match(/src=["'](.*?)["']/)?.[1];
-    if (!src) return;
-    if (src.startsWith('data:image/png') || src.startsWith('data:image/jpeg') || src.startsWith('data:image/webp')) {
-      setAssociatedImageUrl(src);
-      setConfig((prev) => ({ ...prev, bgImageUrl: src }));
-      return;
-    }
-    const url = sanitizeHttpUrl(src);
-    if (!url) return;
-    setAssociatedImageUrl(url);
-    setConfig((prev) => ({ ...prev, bgImageUrl: url }));
+    setAssociatedImageUrl(src);
+    setConfig((prev) => ({ ...prev, bgImageUrl: src }));
   };
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    setImageInputError(null);
     const file = event.target.files?.[0];
     if (!file) return;
-    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) return;
+    const result = await acceptLocalImageFile(file);
+    if (!result.ok) {
+      setImageInputError(result.error);
+      return;
+    }
     soundFx.playArcaneChime(700, 0.2);
-    const reader = new FileReader();
-    reader.onload = (loadEvent) => {
-      const dataUrl = loadEvent.target?.result;
-      if (typeof dataUrl !== 'string') return;
-      setAssociatedImageUrl(dataUrl);
-      setConfig((prev) => ({ ...prev, bgImageUrl: dataUrl }));
-    };
-    reader.readAsDataURL(file);
+    setAssociatedImageUrl(result.dataUrl);
+    setConfig((prev) => ({ ...prev, bgImageUrl: result.dataUrl }));
   };
 
   const handleDownloadPng = async () => {
@@ -140,7 +129,13 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      setExportError(error instanceof Error ? error.message : 'Falha ao exportar PNG.');
+      const message = error instanceof Error ? error.message : 'Falha ao exportar PNG.';
+      const remoteConfigured = Boolean(config.bgImageUrl?.startsWith('http'));
+      setExportError(
+        remoteConfigured
+          ? 'A imagem remota não permite exportação pelo navegador. Use Upload local ou uma origem com CORS habilitado.'
+          : message,
+      );
     } finally {
       setIsExporting(false);
     }
@@ -293,9 +288,11 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
           <div className="bg-[#13171f] rounded-xl p-5 border border-[#004d4d]/50 space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-white/5">
               <ImageIcon className="w-5 h-5 text-[#00f2ff]" />
-              <h3 className="font-cinzel text-base font-semibold">3. Imagem de fundo (local)</h3>
+              <h3 className="font-cinzel text-base font-semibold">3. Imagem de fundo</h3>
             </div>
-            <p className="text-xs font-lora text-[#d1c5b4]/80">Upload PNG/JPEG/WebP. O ficheiro não sai do browser.</p>
+            <p className="text-xs font-lora text-[#d1c5b4]/80">
+              Upload PNG/JPEG/WebP (máx. 10 MiB, 8192×8192). URLs remotas podem exigir CORS do host para exportar o PNG — prefira upload local para garantir exportação.
+            </p>
             <textarea
               rows={2}
               value={htmlInput}
@@ -312,6 +309,7 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
                 <Upload className="w-4 h-4" /> Upload local
               </button>
             </div>
+            {imageInputError && <p className="text-xs text-rose-300">{imageInputError}</p>}
           </div>
         </div>
 
@@ -385,7 +383,7 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
             <p className="text-[11px] font-lora text-[#d1c5b4]/70">
               {activeEmbedType === 'standard' && 'O PNG não contém hyperlink. Este HTML envolve a imagem com um link seguro.'}
               {activeEmbedType === 'markdown' && 'Markdown para README ou Notion. O clique é do Markdown, não do PNG.'}
-              {activeEmbedType === 'iframe' && 'Incorpora este hub. Origem limitada a http/https da página actual.'}
+              {activeEmbedType === 'iframe' && 'Incorpora este hub. Clipboard e download podem estar limitados dentro de iframes em outros sites.'}
             </p>
             {safeTarget && (
               <a href={safeTarget} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[11px] text-[#00f2ff]">

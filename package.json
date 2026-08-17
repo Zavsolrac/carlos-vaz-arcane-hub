@@ -6,7 +6,7 @@
   "description": "Professional sharing hub and social asset studio for Carlos Vaz — The Arcane Architect.",
   "scripts": {
     "dev": "vite --port=3000",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/generate-og-image.mjs && tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "test": "vitest run",

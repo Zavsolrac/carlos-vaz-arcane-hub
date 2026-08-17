@@ -58,6 +58,8 @@ O binário Ringbearer **não** está neste repositório. Sem licença de redistr
 
 Sem auth, base de dados, cookies obrigatórios, tracking ou upload para servidor. Imagens de fundo ficam no browser.
 
+Tipografia Cinzel, Inter e Lora são carregadas em runtime via Google Fonts (`fonts.googleapis.com` / `fonts.gstatic.com`). Não é um runtime totalmente auto-contido.
+
 ## Configuração de ligações
 
 Editar `src/data/defaultData.ts`. Só entram URLs verificáveis. LinkedIn, WhatsApp e e-mail omitidos até existirem fontes públicas confirmadas. GitHub verificado: https://github.com/Zavsolrac

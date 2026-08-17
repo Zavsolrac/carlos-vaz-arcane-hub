@@ -1,4 +1,5 @@
 const ALLOWED_PROTOCOLS = new Set(['http:', 'https:']);
+const DATA_URL_RE = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/i;
 
 export function sanitizeHttpUrl(raw: string): string | null {
   const trimmed = raw.trim();
@@ -11,6 +12,17 @@ export function sanitizeHttpUrl(raw: string): string | null {
   } catch {
     return null;
   }
+}
+
+export function isAllowedImageDataUrl(value: string): boolean {
+  return DATA_URL_RE.test(value.trim());
+}
+
+export function sanitizeImageSrc(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (isAllowedImageDataUrl(trimmed)) return trimmed;
+  return sanitizeHttpUrl(trimmed);
 }
 
 export function escapeHtml(value: string): string {
@@ -26,6 +38,13 @@ export function escapeMarkdownAlt(value: string): string {
   return value.replaceAll('\\', '\\\\').replaceAll('[', '\\[').replaceAll(']', '\\]').replaceAll('\n', ' ');
 }
 
+export function wrapMarkdownDestination(url: string): string {
+  if (/[\s()<>]/.test(url)) {
+    return `<${url.replaceAll('<', '%3C').replaceAll('>', '%3E')}>`;
+  }
+  return url;
+}
+
 export function isSafeAssetFilename(value: string): boolean {
   return /^[a-zA-Z0-9._-]+\.(png|jpe?g|webp)$/i.test(value);
 }
@@ -36,8 +55,8 @@ export function resolveEmbedImageSrc(associatedImageUrl: string, fallbackFilenam
   }
   const trimmed = associatedImageUrl.trim();
   if (!trimmed) return fallbackFilename;
-  const httpUrl = sanitizeHttpUrl(trimmed);
-  if (httpUrl) return httpUrl;
+  const safeImage = sanitizeImageSrc(trimmed);
+  if (safeImage) return safeImage;
   if (isSafeAssetFilename(trimmed)) return trimmed;
   return fallbackFilename;
 }

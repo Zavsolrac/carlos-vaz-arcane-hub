@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { BioLink } from '../types';
+import { GENERATOR_HASH } from '../lib/site';
 import { soundFx } from '../utils/sound';
 import {
   Sparkles,
@@ -13,7 +14,6 @@ import {
   Copy,
   Check,
   Globe,
-  Share2,
   FolderGit2,
 } from 'lucide-react';
 
@@ -46,25 +46,27 @@ const getIcon = (iconName: string) => {
 export const BioLinksSection: React.FC<BioLinksProps> = ({ links, onSelectLink }) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const handleCopy = (e: React.MouseEvent, link: BioLink) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleCopy = (link: BioLink) => {
     soundFx.playArcaneChime(750, 0.2);
-
     const fullUrl = link.url.startsWith('#')
       ? `${window.location.origin}${window.location.pathname}${link.url}`
       : link.url;
-
     navigator.clipboard.writeText(fullUrl);
     setCopiedId(link.id);
-    setTimeout(() => setCopiedId(null), 2000);
+    window.setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleClick = (link: BioLink) => {
+  const handleOpen = (link: BioLink) => {
     soundFx.playHoverWhisper();
-    if (onSelectLink) {
-      onSelectLink(link);
+    if (link.url === GENERATOR_HASH) {
+      onSelectLink?.(link);
+      return;
     }
+    if (link.url.startsWith('#')) {
+      window.location.hash = link.url;
+      return;
+    }
+    window.open(link.url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -84,13 +86,8 @@ export const BioLinksSection: React.FC<BioLinksProps> = ({ links, onSelectLink }
           const isCopied = copiedId === link.id;
 
           return (
-            <motion.a
+            <motion.div
               key={link.id}
-              href={link.url}
-              target={link.url.startsWith('#') ? '_self' : '_blank'}
-              rel={link.url.startsWith('#') ? undefined : 'noopener noreferrer'}
-              onClick={() => handleClick(link)}
-              onMouseEnter={() => soundFx.playHoverWhisper()}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: idx * 0.08 }}
@@ -100,8 +97,11 @@ export const BioLinksSection: React.FC<BioLinksProps> = ({ links, onSelectLink }
                   : 'bg-[#13171f]/80 backdrop-blur-sm border border-[#004d4d]/40 hover:border-[#00f2ff]/60 hover:bg-[#161c26] hover:shadow-[0_0_20px_rgba(0,242,255,0.12)]'
               }`}
             >
-              {/* Left icon with glowing background */}
-              <div className="flex items-center gap-3.5 min-w-0 pr-2">
+              <button
+                type="button"
+                onClick={() => handleOpen(link)}
+                className="flex items-center gap-3.5 min-w-0 pr-2 flex-1 text-left"
+              >
                 <div
                   className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 ${
                     link.highlight
@@ -109,11 +109,9 @@ export const BioLinksSection: React.FC<BioLinksProps> = ({ links, onSelectLink }
                       : 'bg-[#00f2ff]/10 border border-[#00f2ff]/30 text-[#00f2ff]'
                   }`}
                 >
-                  <IconComp className="w-5 h-5" />
+                  <IconComp className="w-5 h-5" aria-hidden="true" />
                 </div>
-
-                {/* Title & Subtitle */}
-                <div className="min-w-0 text-left">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-cinzel text-sm sm:text-base font-semibold text-[#e5e2e1] group-hover:text-[#00f2ff] transition-colors truncate">
                       {link.title}
@@ -124,31 +122,24 @@ export const BioLinksSection: React.FC<BioLinksProps> = ({ links, onSelectLink }
                       </span>
                     )}
                   </div>
-                  <p className="font-lora text-xs text-[#d1c5b4]/80 truncate mt-0.5">
-                    {link.subtitle}
-                  </p>
+                  <p className="font-lora text-xs text-[#d1c5b4]/80 truncate mt-0.5">{link.subtitle}</p>
                 </div>
-              </div>
+              </button>
 
-              {/* Right action buttons: Copy & External Link arrow */}
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
-                  onClick={(e) => handleCopy(e, link)}
-                  title="Copiar link"
+                  onClick={() => handleCopy(link)}
+                  aria-label={`Copiar link de ${link.title}`}
                   className="p-2 rounded-lg bg-[#0a0a0a]/70 border border-white/5 text-[#d1c5b4] hover:text-[#00f2ff] hover:border-[#00f2ff]/40 transition-colors opacity-75 group-hover:opacity-100"
                 >
-                  {isCopied ? (
-                    <Check className="w-4 h-4 text-emerald-400" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
+                  {isCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 </button>
-                <div className="p-2 text-[#d1c5b4]/50 group-hover:text-[#00f2ff] transition-colors">
+                <span className="p-2 text-[#d1c5b4]/50 group-hover:text-[#00f2ff] transition-colors" aria-hidden="true">
                   <ExternalLink className="w-4 h-4" />
-                </div>
+                </span>
               </div>
-            </motion.a>
+            </motion.div>
           );
         })}
       </div>

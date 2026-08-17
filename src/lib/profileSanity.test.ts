@@ -20,6 +20,7 @@ const FORBIDDEN = [
   'Sigil Forge',
   'Nexus Core',
   '+55 11 99999-9999',
+  'images.unsplash.com',
 ];
 
 function walk(dir: string): string[] {
