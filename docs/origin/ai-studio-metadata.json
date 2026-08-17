@@ -1,6 +1,5 @@
 {
-  "note": "Archived AI Studio export metadata. Not used at runtime. The standalone hub is a static client app and does not call Gemini.",
+  "note": "Archived AI Studio export metadata. Not used at runtime. This hub is a static client app and does not call Gemini.",
   "originalName": "Carlos Vaz - The Arcane Architect",
-  "originalDescription": "Interactive dark-fantasy professional hub with social card export.",
   "source": "Google AI Studio / Stitch export"
 }

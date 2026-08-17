@@ -1,9 +1,4 @@
-import {
-  escapeHtml,
-  escapeMarkdownAlt,
-  resolveEmbedImageSrc,
-  sanitizeHttpUrl,
-} from './urls';
+import { escapeHtml, escapeMarkdownAlt, resolveEmbedImageSrc, sanitizeHttpUrl } from './urls';
 
 export function buildClickableHtml(options: {
   targetUrl: string;
@@ -13,12 +8,9 @@ export function buildClickableHtml(options: {
 }): string | null {
   const href = sanitizeHttpUrl(options.targetUrl);
   if (!href) return null;
-
   const src = resolveEmbedImageSrc(options.imageSrc, options.fallbackFilename);
-  const alt = escapeHtml(options.alt);
-
   return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">
-  <img src="${escapeHtml(src)}" alt="${alt}" />
+  <img src="${escapeHtml(src)}" alt="${escapeHtml(options.alt)}" />
 </a>`;
 }
 
@@ -30,9 +22,12 @@ export function buildClickableMarkdown(options: {
 }): string | null {
   const href = sanitizeHttpUrl(options.targetUrl);
   if (!href) return null;
-
   const src = resolveEmbedImageSrc(options.imageSrc, options.fallbackFilename);
-  const alt = escapeMarkdownAlt(options.alt);
+  return `[![${escapeMarkdownAlt(options.alt)}](${src})](${href})`;
+}
 
-  return `[![${alt}](${src})](${href})`;
+export function buildIframeSnippet(origin: string, title: string): string | null {
+  const href = sanitizeHttpUrl(origin);
+  if (!href) return null;
+  return `<iframe src="${escapeHtml(href)}" width="380" height="620" title="${escapeHtml(title)}" sandbox="allow-scripts allow-same-origin allow-popups" referrerpolicy="no-referrer"></iframe>`;
 }

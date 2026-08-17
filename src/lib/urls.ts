@@ -3,7 +3,6 @@ const ALLOWED_PROTOCOLS = new Set(['http:', 'https:']);
 export function sanitizeHttpUrl(raw: string): string | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
-
   try {
     const url = new URL(trimmed);
     if (!ALLOWED_PROTOCOLS.has(url.protocol)) return null;
@@ -32,17 +31,13 @@ export function isSafeAssetFilename(value: string): boolean {
 }
 
 export function resolveEmbedImageSrc(associatedImageUrl: string, fallbackFilename: string): string {
-  if (isSafeAssetFilename(fallbackFilename) === false) {
+  if (!isSafeAssetFilename(fallbackFilename)) {
     throw new Error('Unsafe fallback filename');
   }
-
   const trimmed = associatedImageUrl.trim();
   if (!trimmed) return fallbackFilename;
-
   const httpUrl = sanitizeHttpUrl(trimmed);
   if (httpUrl) return httpUrl;
-
   if (isSafeAssetFilename(trimmed)) return trimmed;
-
   return fallbackFilename;
 }

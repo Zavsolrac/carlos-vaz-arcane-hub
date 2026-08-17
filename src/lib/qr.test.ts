@@ -6,16 +6,13 @@ import { generateQrDataUrl } from './qr';
 const PORTFOLIO_URL = 'https://portifoleo-carlos-vaz.vercel.app/';
 
 function decodeQr(dataUrl: string): string | null {
-  const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
-  const png = PNG.sync.read(Buffer.from(base64, 'base64'));
-  const result = jsQR(new Uint8ClampedArray(png.data.buffer), png.width, png.height);
-  return result?.data ?? null;
+  const png = PNG.sync.read(Buffer.from(dataUrl.replace(/^data:image\/png;base64,/, ''), 'base64'));
+  return jsQR(new Uint8ClampedArray(png.data.buffer), png.width, png.height)?.data ?? null;
 }
 
 describe('QR payload', () => {
   it('encodes the canonical portfolio URL', async () => {
-    const dataUrl = await generateQrDataUrl(PORTFOLIO_URL);
-    expect(decodeQr(dataUrl)).toBe(PORTFOLIO_URL);
+    expect(decodeQr(await generateQrDataUrl(PORTFOLIO_URL))).toBe(PORTFOLIO_URL);
   });
 
   it('rejects non-http targets', async () => {

@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/*
+  Ringbearer is the intended signature face for CARLOS VAZ.
+  It is NOT bundled. No redistribution license is proven for the font file.
+  If the licensed font is installed locally, local('Ringbearer') is used.
+  Cinzel is the public fallback — not presented as Ringbearer.
+*/
+@font-face {
+  font-family: 'Ringbearer';
+  src: local('Ringbearer'), local('Ringbearer Medium');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --void-black: #0a0a0a;
@@ -13,18 +27,6 @@
     --on-surface-variant: #d1c5b4;
   }
 
-  /*
-    Ringbearer is the intended signature face for CARLOS VAZ.
-    It is NOT bundled and is not redistributed.
-    If the licensed font is installed locally, `local('Ringbearer')` picks it up.
-    Cinzel is the public fallback, not a stand-in name for Ringbearer.
-  */
-  @font-face {
-    font-family: 'Ringbearer';
-    src: local('Ringbearer'), local('Ringbearer Medium');
-    font-display: swap;
-  }
-
   body {
     background-color: var(--void-black);
     color: var(--on-surface);
@@ -32,12 +34,14 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, .font-cinzel {
-    font-family: 'Cinzel', serif;
+  /* Ringbearer font strictly reserved for Carlos Vaz identity display */
+  .font-ringbearer {
+    font-family: 'Ringbearer', 'Cinzel', serif;
+    letter-spacing: 0.08em;
   }
 
-  .font-signature {
-    font-family: 'Ringbearer', 'Cinzel', serif;
+  h1, h2, h3, h4, .font-cinzel {
+    font-family: 'Cinzel', serif;
   }
 
   .font-lora {
@@ -47,17 +51,12 @@
   .font-inter {
     font-family: 'Inter', sans-serif;
   }
-
-  :focus-visible {
-    outline: 2px solid #00f2ff;
-    outline-offset: 3px;
-  }
 }
 
+/* Arcane visual accents */
 .gold-gradient-text {
   background: linear-gradient(135deg, #fff2cc 0%, #e9c176 40%, #c5a059 70%, #8c6e2d 100%);
   -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -66,15 +65,41 @@
   text-shadow: 0 0 12px rgba(0, 242, 255, 0.4);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+.gold-glow-box {
+  box-shadow: 0 0 25px rgba(233, 193, 118, 0.15);
 }
 
+.cyan-glow-box {
+  box-shadow: 0 0 25px rgba(0, 242, 255, 0.18);
+}
+
+.arcane-border {
+  border: 1px solid rgba(0, 77, 77, 0.45);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arcane-border:hover {
+  border-color: rgba(0, 242, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.12);
+}
+
+.gold-border {
+  border: 1px solid rgba(197, 160, 89, 0.35);
+}
+
+.gold-border:hover {
+  border-color: rgba(233, 193, 118, 0.7);
+  box-shadow: 0 0 20px rgba(233, 193, 118, 0.2);
+}
+
+/* Subtle starry / constellation background */
+.bg-arcane-grid {
+  background-size: 40px 40px;
+  background-image:
+    radial-gradient(circle, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

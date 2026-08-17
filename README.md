@@ -1,62 +1,14 @@
 # Carlos Vaz — Arcane Professional Hub
 
-Hub profissional de [Carlos Vaz](https://github.com/Zavsolrac), *The Arcane Architect*.
+Hub profissional de Carlos Vaz, *The Arcane Architect*. Complementa — não substitui — o portfólio canónico:
 
-Não substitui o portfólio principal. É a porta de entrada rápida: identidade, atalhos verificáveis e um gerador de peças sociais.
+https://portifoleo-carlos-vaz.vercel.app/
 
-**Portfólio canónico:** [https://portifoleo-carlos-vaz.vercel.app/](https://portifoleo-carlos-vaz.vercel.app/)
+## Propósito
 
-Desenvolvedor Web · IA · Storytelling Digital.
-
-*Transformo ideias em experiências digitais com identidade.*
-
-## Relação com o portfólio
-
-| Este hub | Portfólio canónico |
-| --- | --- |
-| Link-in-bio autoral | Narrativa completa, ofício e contratos |
-| Gerador de cards 9:16 e 1:1 | Experiência imersiva do atelier |
-| Atalhos para GitHub e portfólio | Fonte de verdade profissional |
-
-Contacto e orçamento vivem no portfólio. Este repositório não publica telefone, e-mail nem redes não verificadas.
-
-## Stack
-
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS 4
-- Motion
-- html2canvas (exportação PNG no cliente)
-- qrcode (QR real no cartão)
-
-Aplicação estática. Sem backend, sem base de dados, sem autenticação, sem analytics, sem runtime Gemini.
-
-## Funcionalidades
-
-- Identidade: Carlos Vaz · The Arcane Architect
-- Portais: portfólio canónico, GitHub (`Zavsolrac`), gerador
-- Gerador PNG 1080×1920 (9:16) e 1080×1080 (1:1), com composição própria por formato
-- QR Code real apontando para a URL de destino (predefinição: portfólio)
-- HTML (`<a rel="noopener noreferrer">` + `<img>`) e Markdown clicável
-- Upload local de PNG/JPEG/WebP, processado só no browser
-- Som desligado por omissão; exige clique explícito
-
-O PNG é uma imagem estática. Não contém hyperlink. O clique existe no HTML ou Markdown que envolve a imagem.
-
-## Tipografia
-
-A assinatura **CARLOS VAZ** usa a cadeia:
-
-`Ringbearer → Cinzel → serif`
-
-`RINGBEARER_ASSET_REQUIRED=True`
-
-O ficheiro da fonte Ringbearer **não** está neste repositório. Sem licença clara de redistribuição, não é feito download nem commit do binário. Se a fonte estiver instalada no sistema, o CSS usa `local('Ringbearer')`. Cinzel é o fallback público — não é apresentado como Ringbearer.
+Porta de entrada rápida, link-in-bio autoral e ateliê de peças sociais (PNG estático + HTML/Markdown clicável + QR real).
 
 ## Setup
-
-Requisitos: Node.js 20+.
 
 ```bash
 npm install
@@ -72,61 +24,44 @@ npm run build
 npm run preview
 ```
 
-Não há variáveis de ambiente. Não existe `GEMINI_API_KEY`.
+Não há variáveis de ambiente. Não existe runtime Gemini.
 
-## Arquitetura
+## Stack
 
-```
-src/
-  data/profile.ts          Identidade e ligações verificáveis
-  lib/urls.ts              Sanitização http(s)
-  lib/embed.ts             HTML e Markdown seguros
-  lib/exportPresets.ts     1080×1920 e 1080×1080
-  lib/qr.ts                QR real
-  components/CardFace.tsx  Composição do cartão
-  components/CardStudio.tsx Preview + exportação
-```
+React 19 · TypeScript · Vite · Tailwind CSS 4 · Motion · html2canvas · qrcode
 
-A preview pode ser menor. A exportação renderiza a composição nas dimensões finais, em vez de ampliar um cartão 360×580.
+Aplicação estática. Sem backend, base de dados, autenticação ou analytics.
 
-## Geração de cards
+## Exportação social
 
-1. Escolher Story (9:16) ou Quadrado (1:1)
-2. Confirmar a URL de destino (`http`/`https` apenas)
-3. Opcional: QR, fundo por upload local ou URL de imagem
+1. Escolher 9:16 (1080×1920) ou 1:1 (1080×1080)
+2. Confirmar URL http/https (predefinição: portfólio canónico)
+3. Opcional: QR e fundo por upload local
 4. Baixar PNG
 5. Copiar HTML ou Markdown para tornar a imagem clicável noutro sítio
 
-Formatos:
+O PNG é só imagem. O clique vive no HTML/Markdown.
 
-- Status / Story: **1080 × 1920 px**
-- Quadrado: **1080 × 1080 px**
+Image Map foi desactivado na V1: as coordenadas não acompanhavam as dimensões reais de exportação.
+
+## Tipografia
+
+Assinatura CARLOS VAZ: `Ringbearer → Cinzel → serif`
+
+O binário Ringbearer **não** está neste repositório. Sem licença de redistribuição comprovada, o CSS usa apenas `local('Ringbearer')`. Cinzel é o fallback público.
 
 ## Privacidade
 
-- `AUTH=False`
-- `DATABASE=False`
-- `ANALYTICS=False`
-- `TRACKING=False`
-- `COOKIES_REQUIRED=False`
-- `NO_IMAGE_UPLOAD_TO_BACKEND=True`
-- `GEMINI_RUNTIME_REQUIRED=False`
-- `SERVER_RUNTIME_REQUIRED=False`
+Sem auth, base de dados, cookies obrigatórios, tracking ou upload para servidor. Imagens de fundo ficam no browser.
 
-## Configuração dos links
+## Configuração de ligações
 
-Editar `src/data/profile.ts`. Só entram URLs verificáveis. LinkedIn, WhatsApp e e-mail ficam de fora até existirem fontes públicas confirmadas.
-
-## Deploy
-
-Build estático (`npm run build` → `dist/`). Serve em qualquer host de sites estáticos (Vercel, Netlify, GitHub Pages, Cloudflare Pages). Não há servidor Node em produção.
+Editar `src/data/defaultData.ts`. Só entram URLs verificáveis. LinkedIn, WhatsApp e e-mail omitidos até existirem fontes públicas confirmadas. GitHub verificado: https://github.com/Zavsolrac
 
 ## Origin
 
-O conceito nasceu como experimentação visual no Google Stitch / AI Studio (pedido inicial: banner profissional 9:16). A exportação foi auditada, sanitizada e reescrita como produto independente: dados fictícios removidos, dependências de Gemini/Express não usadas retiradas, e o gerador corrigido para PNG estático + wrapper HTML/Markdown + QR real.
+O conceito nasceu como experimentação visual no Google Stitch / AI Studio e foi auditado como produto independente. Metadata de origem em `docs/origin/`.
 
-A metadata original do AI Studio está em `docs/origin/` apenas como rasto de proveniência. Não descreve o runtime actual.
+## Deploy
 
-## Licença
-
-Código: uso pessoal e profissional de Carlos Vaz. Não redistribuir fontes de terceiros sem a respectiva licença.
+`npm run build` gera `dist/`. Publicação web não faz parte deste repositório GitHub.
