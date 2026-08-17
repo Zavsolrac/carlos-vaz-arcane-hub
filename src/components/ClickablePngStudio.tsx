@@ -169,7 +169,11 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
   );
 
   const iframeCode = useMemo(
-    () => buildIframeSnippet(typeof window === 'undefined' ? '' : window.location.origin, `${config.name} — ${config.title}`),
+    () =>
+      buildIframeSnippet(
+        typeof window === 'undefined' ? '' : new URL(import.meta.env.BASE_URL, window.location.origin).href,
+        `${config.name} — ${config.title}`,
+      ),
     [config.name, config.title],
   );
 

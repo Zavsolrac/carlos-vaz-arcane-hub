@@ -42,4 +42,10 @@ describe('embed generators', () => {
   it('rejects unsafe iframe origins', () => {
     expect(buildIframeSnippet('javascript:alert(1)', 'x')).toBeNull();
   });
+
+  it('accepts a GitHub Pages project URL', () => {
+    const html = buildIframeSnippet('https://zavsolrac.github.io/carlos-vaz-arcane-hub/', 'Carlos Vaz');
+    expect(html).toContain('src="https://zavsolrac.github.io/carlos-vaz-arcane-hub/"');
+    expect(html).toContain('sandbox=');
+  });
 });
