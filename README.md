@@ -4,6 +4,10 @@ Hub profissional de Carlos Vaz, *The Arcane Architect*. Complementa — não sub
 
 https://portifoleo-carlos-vaz.vercel.app/
 
+## Live Demo
+
+https://zavsolrac.github.io/carlos-vaz-arcane-hub/
+
 ## Propósito
 
 Porta de entrada rápida, link-in-bio autoral e ateliê de peças sociais (PNG estático + HTML/Markdown clicável + QR real).
@@ -64,4 +68,6 @@ O conceito nasceu como experimentação visual no Google Stitch / AI Studio e fo
 
 ## Deploy
 
-`npm run build` gera `dist/`. Publicação web não faz parte deste repositório GitHub.
+`npm run build` gera `dist/`. GitHub Pages publica automaticamente a partir de `.github/workflows/deploy-pages.yml` em cada push para `main`.
+
+Live Demo: https://zavsolrac.github.io/carlos-vaz-arcane-hub/
