@@ -1,14 +1,11 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import puppeteer from 'puppeteer-core';
 
+import { resolveChromeExecutable } from './resolve-chrome.mjs';
+
 const OUT_DIR = join(process.cwd(), 'public');
 const OUT_FILE = join(OUT_DIR, 'og-image.png');
-
-if (process.env.CI === 'true' && existsSync(OUT_FILE)) {
-  console.log(`CI: reusing committed ${OUT_FILE}`);
-  process.exit(0);
-}
 
 mkdirSync(OUT_DIR, { recursive: true });
 
@@ -94,7 +91,7 @@ const html = `<!doctype html>
 </html>`;
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  executablePath: resolveChromeExecutable(),
   headless: true,
   args: ['--no-sandbox'],
 });

@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import jsQR from 'jsqr';
 import puppeteer from 'puppeteer-core';
+import { resolveChromeExecutable } from './resolve-chrome.mjs';
 
 const URL = process.env.PUBLIC_URL || 'https://zavsolrac.github.io/carlos-vaz-arcane-hub/';
 const OUT = join(process.cwd(), 'coverage', 'hardening-e2e');
@@ -18,7 +19,7 @@ function decodeQr(buf) {
 }
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  executablePath: resolveChromeExecutable(),
   headless: true,
   args: ['--no-sandbox'],
 });

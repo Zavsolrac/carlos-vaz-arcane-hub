@@ -5,12 +5,14 @@ interface MedallionProps {
   size?: number;
   className?: string;
   glow?: boolean;
+  exportSafe?: boolean;
 }
 
 export const ArcaneEyeMedallion: React.FC<MedallionProps> = ({
   size = 96,
   className = '',
   glow = true,
+  exportSafe = false,
 }) => {
   return (
     <div
@@ -25,7 +27,17 @@ export const ArcaneEyeMedallion: React.FC<MedallionProps> = ({
       }}
     >
       {/* Background ambient radial glow */}
-      <div className="absolute inset-0 rounded-2xl bg-radial from-[#e9c176]/15 via-[#00f2ff]/5 to-transparent pointer-events-none" />
+      {exportSafe ? (
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 50%, rgba(233, 193, 118, 0.15) 0%, rgba(0, 242, 255, 0.05) 50%, transparent 100%)',
+          }}
+        />
+      ) : (
+        <div className="absolute inset-0 rounded-2xl bg-radial from-[#e9c176]/15 via-[#00f2ff]/5 to-transparent pointer-events-none" />
+      )}
 
       {/* SVG Sacred Geometry Eye & Relic */}
       <svg

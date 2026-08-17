@@ -27,6 +27,7 @@ import {
   type ExportFormat,
 } from '../lib/exportPresets';
 import { readPngSize } from '../lib/png';
+import { assertExportColorsSafe } from '../lib/exportColorGuard';
 import { generateQrDataUrl } from '../lib/qr';
 import { acceptLocalImageFile, extractImageSrcInBrowser } from '../lib/imageInput';
 import { sanitizeHttpUrl } from '../lib/urls';
@@ -108,6 +109,7 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
     try {
       if (document.fonts?.ready) await document.fonts.ready;
       await new Promise((resolve) => window.setTimeout(resolve, 120));
+      assertExportColorsSafe(exportRef.current);
       const canvas = await html2canvas(exportRef.current, {
         backgroundColor: '#0a0a0a',
         scale: 1,
@@ -129,12 +131,14 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Falha ao exportar PNG.';
+      if (import.meta.env.DEV) {
+        console.error('[arcane-export]', error);
+      }
       const remoteConfigured = Boolean(config.bgImageUrl?.startsWith('http'));
       setExportError(
         remoteConfigured
           ? 'A imagem remota não permite exportação pelo navegador. Use Upload local ou uma origem com CORS habilitado.'
-          : message,
+          : 'Não foi possível gerar o PNG. Tente novamente ou remova a imagem de fundo remota.',
       );
     } finally {
       setIsExporting(false);
@@ -332,13 +336,13 @@ export function ClickablePngStudio({ initialConfig }: ClickablePngStudioProps) {
           <div className="relative rounded-2xl p-2 bg-gradient-to-b from-[#00f2ff]/20 via-transparent to-[#e9c176]/20" style={{ width: PREVIEW_WIDTH + 16 }}>
             <div className="overflow-hidden rounded-xl" style={{ width: PREVIEW_WIDTH, height: height * scale }}>
               <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-                <StudioCard config={config} qrCodeDataUrl={qrCodeDataUrl} width={width} height={height} />
+                <StudioCard config={config} qrCodeDataUrl={qrCodeDataUrl} width={width} height={height} exportSafe={false} />
               </div>
             </div>
           </div>
           <div aria-hidden="true" style={{ position: 'fixed', left: -20000, top: 0, width, height, pointerEvents: 'none' }}>
             <div ref={exportRef} id="arcane-export-root" data-export-format={format} style={{ width, height }}>
-              <StudioCard config={config} qrCodeDataUrl={qrCodeDataUrl} width={width} height={height} />
+              <StudioCard config={config} qrCodeDataUrl={qrCodeDataUrl} width={width} height={height} exportSafe />
             </div>
           </div>
 
@@ -402,11 +406,13 @@ function StudioCard({
   qrCodeDataUrl,
   width,
   height,
+  exportSafe = false,
 }: {
   config: PngCardConfig;
   qrCodeDataUrl: string;
   width: number;
   height: number;
+  exportSafe?: boolean;
 }) {
   const isStory = height > width;
   return (
@@ -451,8 +457,25 @@ function StudioCard({
         {config.badgeText || 'PORTFÓLIO OFICIAL'}
       </span>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: isStory ? 24 : 16 }}>
-        <ArcaneEyeMedallion size={isStory ? 220 : 156} />
-        <h3 className="font-ringbearer gold-gradient-text" style={{ margin: 0, fontSize: isStory ? 72 : 56, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        <ArcaneEyeMedallion size={isStory ? 220 : 156} exportSafe={exportSafe} />
+        <h3
+          className={exportSafe ? 'font-ringbearer' : 'font-ringbearer gold-gradient-text'}
+          style={{
+            margin: 0,
+            fontSize: isStory ? 72 : 56,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            ...(exportSafe
+              ? {
+                  background: 'linear-gradient(135deg, #fff2cc 0%, #e9c176 40%, #c5a059 70%, #8c6e2d 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                }
+              : {}),
+          }}
+        >
           {config.name}
         </h3>
         <p className="font-cinzel" style={{ margin: 0, fontSize: isStory ? 26 : 20, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#d1c5b4' }}>

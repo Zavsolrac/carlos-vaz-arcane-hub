@@ -4,6 +4,7 @@ import { extname, join } from 'node:path';
 import { PNG } from 'pngjs';
 import jsQR from 'jsqr';
 import puppeteer from 'puppeteer-core';
+import { resolveChromeExecutable } from './resolve-chrome.mjs';
 
 const BASE = '/carlos-vaz-arcane-hub';
 const DIST = join(process.cwd(), 'dist');
@@ -44,7 +45,7 @@ const server = createServer((req, res) => {
 await new Promise((resolve) => server.listen(4177, resolve));
 
 const browser = await puppeteer.launch({
-  executablePath: process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  executablePath: resolveChromeExecutable(),
   headless: true,
   args: ['--no-sandbox'],
 });
